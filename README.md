@@ -1,4 +1,4 @@
-<h1>Next.js + Minio / S3 + Prisma</h1> 
+<h1>Next.js + Minio + S3 + Prisma</h1> 
 
 <p>
     <b>This repository is a quick guide developed to assist developers there are using S3 or minIO with Next.js</b>
@@ -39,7 +39,7 @@ S3_SECRET_ACCESS_KEY="password"
 S3_BUCKET="bucket-name"
 ```
 
-#### 3. Create a `.env` file in the root directory and add your environment variables as follows:
+#### 3. Create a `s3.ts` file in the `actions.` directory and add the code as follows:
 
 ```ts
 'use server'
@@ -114,16 +114,23 @@ export async function getSignedURL({
     expiresIn: 60,
   })
 
-  // await prisma.image.create({
-  //   data: {
-  //     fileName: '',
-  //     userId: session.userId,
-  //   },
-  // })
+  // Here you can save the image in the db with Drizzle or Prisma or anything you want
 
   return { success: { url: signedURL } }
 }
 
+```
+
+#### 4. Add `computeSHA256` in `lib` folder:
+
+```ts
+export async function computeSHA256(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer()
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return hashHex
+}
 ```
 
 <h2 id="contribute">Contribute 🚀</h2>
